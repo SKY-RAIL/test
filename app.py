@@ -1,5 +1,3 @@
-# app.py
-
 from flask import Flask, render_template, request, redirect, url_for, flash
 from people import get_customer_by_id
 from meat import meat_items
@@ -53,6 +51,18 @@ def delete_order(order_index):
     if 0 <= order_index < len(orders):
         del orders[order_index]
     return redirect(url_for("hi"))
+
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+    # 관리자 모드 접근 처리
+    admin_password = "admin123"  # 비밀번호를 하드코딩으로 설정 (보안을 위해 DB나 환경변수를 사용해야 함)
+    if request.method == "POST":
+        password = request.form.get("password")
+        if password == admin_password:
+            return redirect(url_for("hi"))
+        else:
+            flash("잘못된 관리자 비밀번호입니다.")
+    return render_template("admin.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
