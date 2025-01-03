@@ -5,7 +5,8 @@ from meat import meat_items
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
 
-orders = []
+# 주문 내역을 저장할 딕셔너리 (각 customer_id에 대한 주문 내역을 저장)
+orders = {}
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -24,47 +25,42 @@ def hand(customer_id):
     if not customer:
         return redirect(url_for("index"))
 
-    # 기존 주문이 있는지 확인
-    existing_order = next((order for order in orders if order["customer"]["id"] == customer_id), None)
-    
-    if existing_order:
-        flash("이 고객은 이미 주문을 완료하였습니다.")
-        return redirect(url_for("hi"))
-    
+    # 이미 주문한 내역이 있는지 확인
+    existing_order = orders.get(customer_id)
+
     if request.method == "POST":
+        if existing_order:
+            flash("이미 주문을 완료한 고객입니다.")
+            return redirect(url_for("hand", customer_id=customer_id))
+
         selected_items = request.form.getlist("items")
         quantities = request.form.getlist("quantities")
         order_details = []
         total_price = 0
-        
+
         for item, quantity in zip(selected_items, quantities):
             quantity = int(quantity)
             meat_item = next(m for m in meat_items if m["name"] == item)
             price = meat_item["price"] * quantity
             order_details.append({"item": item, "quantity": quantity, "price": price})
             total_price += price
-        
-        orders.append({"customer": customer, "details": order_details, "total_price": total_price})
+
+        orders[customer_id] = {"customer": customer, "details": order_details, "total_price": total_price}
         flash("주문이 완료되었습니다.")
         return redirect(url_for("hand", customer_id=customer_id))
-
-    # 주문 내역을 같은 페이지에 표시
-    existing_order = next((order for order in orders if order["customer"]["id"] == customer_id), None)
+    
     return render_template("hand.html", customer=customer, meat_items=meat_items, existing_order=existing_order)
 
-@app.route("/hi")
-def hi():
-    return render_template("hi.html", orders=orders)
-
-@app.route("/delete_order/<int:order_index>", methods=["POST"])
-def delete_order(order_index):
-    if 0 <= order_index < len(orders):
-        del orders[order_index]
-    return redirect(url_for("hi"))
+@app.route("/delete_order/<customer_id>", methods=["POST"])
+def delete_order(customer_id):
+    if customer_id in orders:
+        del orders[customer_id]
+        flash("주문이 취소되었습니다.")
+    return redirect(url_for("hand", customer_id=customer_id))
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
-    admin_password = "admin123"
+    admin_password = "admin123"  # 비밀번호를 하드코딩으로 설정 (보안을 위해 DB나 환경변수를 사용해야 함)
     if request.method == "POST":
         password = request.form.get("password")
         if password == admin_password:

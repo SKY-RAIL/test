@@ -15,7 +15,7 @@
             {% endfor %}
         </ul>
         <p>총 금액: {{ existing_order.total_price }}원</p>
-        <form method="POST" action="{{ url_for('delete_order', order_index=loop.index0) }}">
+        <form method="POST" action="{{ url_for('delete_order', customer_id=customer.id) }}">
             <button type="submit">주문 삭제</button>
         </form>
     {% else %}
