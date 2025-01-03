@@ -64,10 +64,15 @@ def admin():
     if request.method == "POST":
         password = request.form.get("password")
         if password == admin_password:
-            return redirect(url_for("admin"))  # "hi"를 "admin"으로 변경
+            return redirect(url_for("view_orders"))  # "admin"을 "view_orders"로 변경
         else:
             flash("잘못된 관리자 비밀번호입니다.")
     return render_template("admin.html")
+
+# 주문 내역을 확인하는 새로운 관리자 페이지
+@app.route("/view_orders", methods=["GET"])
+def view_orders():
+    return render_template("view_orders.html", orders=orders)
 
 if __name__ == "__main__":
     app.run(debug=True)  # 디버깅 모드 활성화
