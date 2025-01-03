@@ -6,8 +6,8 @@
 <body>
     <h1>배달 수령 주문 내역</h1>
     <ul>
-        {% if car_orders %}
-            {% for order in car_orders.values() %}
+        {% if orders %}
+            {% for order in orders.values() %}
                 <li>
                     주문자: {{ order.sender_name }} ({{ order.sender_phone }}) / 주소: {{ order.sender_address }}
                     받는 사람: {{ order.receiver_name }} ({{ order.receiver_phone }}) / 주소: {{ order.receiver_address }}
@@ -18,7 +18,7 @@
                     </ul>
                     총 금액: {{ order.total_price }}원
                     주문 시간: {{ order.order_time }}
-                    <form method="POST" action="{{ url_for('delete_car_order', customer_id=order.customer_id) }}">
+                    <form method="POST" action="{{ url_for('delete_delivery_order', customer_id=order.customer.id) }}">
                         <button type="submit">삭제</button>
                     </form>
                 </li>
