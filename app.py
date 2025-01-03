@@ -64,7 +64,7 @@ def admin():
     if request.method == "POST":
         password = request.form.get("password")
         if password == admin_password:
-            return redirect(url_for("hi"))
+            return redirect(url_for("admin"))  # "hi"를 "admin"으로 변경
         else:
             flash("잘못된 관리자 비밀번호입니다.")
     return render_template("admin.html")
