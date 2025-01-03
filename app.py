@@ -24,12 +24,13 @@ def hand(customer_id):
     if not customer:
         return redirect(url_for("index"))
 
-    # 고객이 이미 주문을 한 경우, 다시 주문할 수 없도록 제한
+    # 기존 주문이 있는지 확인
     existing_order = next((order for order in orders if order["customer"]["id"] == customer_id), None)
+    
     if existing_order:
-        flash("이미 주문을 완료하셨습니다.")
+        flash("이 고객은 이미 주문을 완료하였습니다.")
         return redirect(url_for("hi"))
-
+    
     if request.method == "POST":
         selected_items = request.form.getlist("items")
         quantities = request.form.getlist("quantities")
@@ -44,9 +45,12 @@ def hand(customer_id):
             total_price += price
         
         orders.append({"customer": customer, "details": order_details, "total_price": total_price})
-        return redirect(url_for("hand", customer_id=customer_id))  # 주문 후 다시 주문 페이지로 돌아가기
+        flash("주문이 완료되었습니다.")
+        return redirect(url_for("hand", customer_id=customer_id))
 
-    return render_template("hand.html", customer=customer, meat_items=meat_items)
+    # 주문 내역을 같은 페이지에 표시
+    existing_order = next((order for order in orders if order["customer"]["id"] == customer_id), None)
+    return render_template("hand.html", customer=customer, meat_items=meat_items, existing_order=existing_order)
 
 @app.route("/hi")
 def hi():
@@ -60,8 +64,7 @@ def delete_order(order_index):
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
-    # 관리자 모드 접근 처리
-    admin_password = "admin123"  # 비밀번호를 하드코딩으로 설정 (보안을 위해 DB나 환경변수를 사용해야 함)
+    admin_password = "admin123"
     if request.method == "POST":
         password = request.form.get("password")
         if password == admin_password:
