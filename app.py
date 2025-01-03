@@ -23,6 +23,7 @@ def index():
 def hand(customer_id):
     customer = get_customer_by_id(customer_id)
     if not customer:
+        flash("올바르지 않은 아이디입니다.")
         return redirect(url_for("index"))
 
     # 이미 주문한 내역이 있는지 확인
@@ -72,6 +73,8 @@ def admin():
 # 주문 내역을 확인하는 새로운 관리자 페이지
 @app.route("/view_orders", methods=["GET"])
 def view_orders():
+    if not orders:
+        flash("현재 주문 내역이 없습니다.")
     return render_template("view_orders.html", orders=orders)
 
 if __name__ == "__main__":
