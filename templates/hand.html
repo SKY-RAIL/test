@@ -27,37 +27,8 @@
                     <input type="number" name="quantities" min="1" value="1">
                 </div>
             {% endfor %}
-            <label for="delivery">배달 수령</label>
-            <input type="radio" name="delivery" value="yes"> 배달 수령
-            <input type="radio" name="delivery" value="no" checked> 직접 수령
-            <br>
-
-            <div id="delivery_info" style="display:none;">
-                <label>보내는 사람 이름:</label><input type="text" name="sender_name"><br>
-                <label>보내는 사람 연락처:</label><input type="text" name="sender_phone"><br>
-                <label>보내는 사람 주소:</label><input type="text" name="sender_address"><br>
-                <label>받는 사람 이름:</label><input type="text" name="receiver_name"><br>
-                <label>받는 사람 연락처:</label><input type="text" name="receiver_phone"><br>
-                <label>받는 사람 주소:</label><input type="text" name="receiver_address"><br>
-            </div>
-
             <button type="submit">주문 완료</button>
         </form>
     {% endif %}
-
-    <script>
-        const deliveryRadios = document.querySelectorAll('input[name="delivery"]');
-        const deliveryInfoDiv = document.getElementById("delivery_info");
-
-        deliveryRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                if (this.value === "yes") {
-                    deliveryInfoDiv.style.display = "block";
-                } else {
-                    deliveryInfoDiv.style.display = "none";
-                }
-            });
-        });
-    </script>
 </body>
 </html>
