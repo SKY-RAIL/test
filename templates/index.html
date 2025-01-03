@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>고기 주문 사이트</title>
+</head>
+<body>
+    <h1>고기 주문 사이트</h1>
+    <form method="POST">
+        <label for="customer_id">아이디 입력:</label>
+        <input type="text" id="customer_id" name="customer_id" required>
+        <button type="submit">직접 수령</button>
+    </form>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>주문 내역 확인</title>
+</head>
+<body>
+    <h1>주문 내역 확인</h1>
+    <ul>
+        {% for order in orders %}
+            <li>
+                주문자: {{ order.customer.name }} / 지점: {{ order.customer.branch }}
+                <ul>
+                    {% for detail in order.details %}
+                        <li>{{ detail.item }} - {{ detail.quantity }}개 ({{ detail.price }}원)</li>
+                    {% endfor %}
+                </ul>
+                총 금액: {{ order.total_price }}원
+                <form method="POST" action="{{ url_for('delete_order', order_index=loop.index0) }}">
+                    <button type="submit">삭제</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
