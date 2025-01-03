@@ -23,7 +23,13 @@ def hand(customer_id):
     customer = get_customer_by_id(customer_id)
     if not customer:
         return redirect(url_for("index"))
-    
+
+    # 고객이 이미 주문을 한 경우, 다시 주문할 수 없도록 제한
+    existing_order = next((order for order in orders if order["customer"]["id"] == customer_id), None)
+    if existing_order:
+        flash("이미 주문을 완료하셨습니다.")
+        return redirect(url_for("hi"))
+
     if request.method == "POST":
         selected_items = request.form.getlist("items")
         quantities = request.form.getlist("quantities")
@@ -38,8 +44,8 @@ def hand(customer_id):
             total_price += price
         
         orders.append({"customer": customer, "details": order_details, "total_price": total_price})
-        return redirect(url_for("hi"))
-    
+        return redirect(url_for("hand", customer_id=customer_id))  # 주문 후 다시 주문 페이지로 돌아가기
+
     return render_template("hand.html", customer=customer, meat_items=meat_items)
 
 @app.route("/hi")
