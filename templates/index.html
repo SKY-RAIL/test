@@ -10,7 +10,7 @@
         <input type="text" id="customer_id" name="customer_id" required>
         <button type="submit">직접 수령</button>
     </form>
-    <form method="POST" action="{{ url_for('car', customer_id=request.form.get('customer_id')) }}">
+    <form method="GET" action="{{ url_for('car', customer_id=request.form.get('customer_id')) }}">
         <button type="submit">배달 수령</button>
     </form>
     <form method="GET" action="{{ url_for('admin') }}">
