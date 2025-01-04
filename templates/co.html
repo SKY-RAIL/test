@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>배달 주문 내역 확인</title>
+</head>
+<body>
+    <h1>배달 주문 내역 확인</h1>
+    <ul>
+        {% if orders %}
+            {% for order in orders.values() %}
+                <li>
+                    주문자: {{ order.sender_name }} / 연락처: {{ order.sender_contact }} / 주소: {{ order.sender_address }}
+                    <br>수령자: {{ order.receiver_name }} / 연락처: {{ order.receiver_contact }} / 주소: {{ order.receiver_address }}
+                    <ul>
+                        {% for detail in order.details %}
+                            <li>{{ detail.item }} - {{ detail.quantity }}개 ({{ detail.price }}원)</li>
+                        {% endfor %}
+                    </ul>
+                    총 금액: {{ order.total_price }}원 / 주문 시간: {{ order.order_time }}
+                    <form method="POST" action="{{ url_for('delete_delivery_order', customer_id=order.customer.id) }}">
+                        <button type="submit">삭제</button>
+                    </form>
+                </li>
+            {% endfor %}
+        {% else %}
+            <li>현재 배달 주문 내역이 없습니다.</li>
+        {% endif %}
+    </ul>
+</body>
+</html>
