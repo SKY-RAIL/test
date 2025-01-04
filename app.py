@@ -1,15 +1,13 @@
-#app.py
-
 from flask import Flask, render_template, request, redirect, url_for, flash
 from people import get_customer_by_id
 from meat import meat_items
-from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
 
+# 주문 내역을 저장할 딕셔너리
 orders = {}
-delivery_orders = {}  # 배달 수령 주문 저장소
+delivery_orders = {}
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -17,9 +15,9 @@ def index():
         customer_id = request.form.get("customer_id")
         customer = get_customer_by_id(customer_id)
         if customer:
-            if "direct" in request.form:
+            if request.form.get("action") == "direct_pickup":
                 return redirect(url_for("hand", customer_id=customer_id))
-            elif "delivery" in request.form:
+            elif request.form.get("action") == "delivery_pickup":
                 return redirect(url_for("car", customer_id=customer_id))
         else:
             flash("올바르지 않은 아이디입니다.")
@@ -33,7 +31,12 @@ def hand(customer_id):
         return redirect(url_for("index"))
 
     existing_order = orders.get(customer_id)
-    if request.method == "POST" and not existing_order:
+
+    if request.method == "POST":
+        if existing_order:
+            flash("이미 주문을 완료한 고객입니다.")
+            return redirect(url_for("hand", customer_id=customer_id))
+
         selected_items = request.form.getlist("items")
         quantities = request.form.getlist("quantities")
         order_details = []
@@ -52,6 +55,13 @@ def hand(customer_id):
     
     return render_template("hand.html", customer=customer, meat_items=meat_items, existing_order=existing_order)
 
+@app.route("/delete_order/<customer_id>", methods=["POST"])
+def delete_order(customer_id):
+    if customer_id in orders:
+        del orders[customer_id]
+        flash("주문이 취소되었습니다.")
+    return redirect(url_for("hand", customer_id=customer_id))
+
 @app.route("/car/<customer_id>", methods=["GET", "POST"])
 def car(customer_id):
     customer = get_customer_by_id(customer_id)
@@ -59,8 +69,13 @@ def car(customer_id):
         flash("올바르지 않은 아이디입니다.")
         return redirect(url_for("index"))
 
-    existing_order = delivery_orders.get(customer_id)
-    if request.method == "POST" and not existing_order:
+    existing_delivery_order = delivery_orders.get(customer_id)
+
+    if request.method == "POST":
+        if existing_delivery_order:
+            flash("이미 배달 주문을 완료한 고객입니다.")
+            return redirect(url_for("car", customer_id=customer_id))
+
         selected_items = request.form.getlist("items")
         quantities = request.form.getlist("quantities")
         sender_name = request.form.get("sender_name")
@@ -72,6 +87,7 @@ def car(customer_id):
 
         order_details = []
         total_price = 0
+
         for item, quantity in zip(selected_items, quantities):
             quantity = int(quantity)
             meat_item = next(m for m in meat_items if m["name"] == item)
@@ -83,18 +99,21 @@ def car(customer_id):
             "customer": customer,
             "details": order_details,
             "total_price": total_price,
-            "sender_name": sender_name,
-            "sender_contact": sender_contact,
-            "sender_address": sender_address,
-            "receiver_name": receiver_name,
-            "receiver_contact": receiver_contact,
-            "receiver_address": receiver_address,
-            "order_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "sender": {
+                "name": sender_name,
+                "contact": sender_contact,
+                "address": sender_address
+            },
+            "receiver": {
+                "name": receiver_name,
+                "contact": receiver_contact,
+                "address": receiver_address
+            }
         }
         flash("배달 주문이 완료되었습니다.")
         return redirect(url_for("car", customer_id=customer_id))
     
-    return render_template("car.html", customer=customer, meat_items=meat_items, existing_order=existing_order)
+    return render_template("car.html", customer=customer, meat_items=meat_items, existing_delivery_order=existing_delivery_order)
 
 @app.route("/delete_delivery_order/<customer_id>", methods=["POST"])
 def delete_delivery_order(customer_id):
@@ -102,10 +121,6 @@ def delete_delivery_order(customer_id):
         del delivery_orders[customer_id]
         flash("배달 주문이 취소되었습니다.")
     return redirect(url_for("car", customer_id=customer_id))
-
-@app.route("/co", methods=["GET"])
-def co():
-    return render_template("co.html", orders=delivery_orders)
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
@@ -121,6 +136,10 @@ def admin():
 @app.route("/view_orders", methods=["GET"])
 def view_orders():
     return render_template("view_orders.html", orders=orders)
+
+@app.route("/co", methods=["GET"])
+def co():
+    return render_template("co.html", delivery_orders=delivery_orders)
 
 if __name__ == "__main__":
     app.run(debug=True)
