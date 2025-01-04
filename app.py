@@ -131,7 +131,7 @@ def delete_delivery_order(customer_id):
     if customer_id in delivery_orders:
         del delivery_orders[customer_id]
         flash("배달 주문이 취소되었습니다.")
-    return redirect(url_for("car", customer_id=customer_id))
+    return redirect(url_for("co"))
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
