@@ -13,15 +13,18 @@ delivery_orders = {}
 def index():
     if request.method == "POST":
         customer_id = request.form.get("customer_id")
+        action = request.form.get("action")
         customer = get_customer_by_id(customer_id)
+
         if customer:
-            if request.form.get("action") == "direct_pickup":
+            if action == "direct_pickup":
                 return redirect(url_for("hand", customer_id=customer_id))
-            elif request.form.get("action") == "delivery_pickup":
+            elif action == "delivery_pickup":
                 return redirect(url_for("car", customer_id=customer_id))
         else:
             flash("올바르지 않은 아이디입니다.")
     return render_template("index.html")
+
 
 @app.route("/hand/<customer_id>", methods=["GET", "POST"])
 def hand(customer_id):
