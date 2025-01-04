@@ -10,7 +10,7 @@
     {% if existing_delivery_order %}
         <h3>주문 내역</h3>
         <ul>
-            {% for detail in existing_order.details %}
+            {% for detail in existing_delivery_order.details %}
                 <li>{{ detail.item }} - {{ detail.quantity }}개 ({{ detail.price }}원)</li>
             {% endfor %}
         </ul>
