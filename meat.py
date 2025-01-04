@@ -1,4 +1,4 @@
-# meat.py
+#meat.py
 
 meat_items = [
     {"name": "삼겹 구이용(1kg)", "price": 19000},

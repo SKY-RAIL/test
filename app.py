@@ -77,18 +77,24 @@ def car(customer_id):
     existing_delivery_order = delivery_orders.get(customer_id)
 
     if request.method == "POST":
-        if existing_delivery_order:
-            flash("이미 배달 주문을 완료한 고객입니다.")
-            return redirect(url_for("car", customer_id=customer_id))
-
-        selected_items = request.form.getlist("items")
-        quantities = request.form.getlist("quantities")
         sender_name = request.form.get("sender_name")
         sender_contact = request.form.get("sender_contact")
         sender_address = request.form.get("sender_address")
         receiver_name = request.form.get("receiver_name")
         receiver_contact = request.form.get("receiver_contact")
         receiver_address = request.form.get("receiver_address")
+
+        # 필수 정보 체크
+        if not all([sender_name, sender_contact, sender_address, receiver_name, receiver_contact, receiver_address]):
+            flash("주문 정보를 올바르게 입력해주십시오")
+            return redirect(url_for("car", customer_id=customer_id))
+
+        if existing_delivery_order:
+            flash("이미 배달 주문을 완료한 고객입니다.")
+            return redirect(url_for("car", customer_id=customer_id))
+
+        selected_items = request.form.getlist("items")
+        quantities = request.form.getlist("quantities")
 
         order_details = []
         total_price = 0
