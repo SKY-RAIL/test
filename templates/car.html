@@ -7,7 +7,7 @@
     <h1>배달 수령 주문 페이지</h1>
     <p>이름: {{ customer.name }}</p>
 
-    {% if existing_order %}
+    {% if existing_delivery_order %}
         <h3>주문 내역</h3>
         <ul>
             {% for detail in existing_order.details %}

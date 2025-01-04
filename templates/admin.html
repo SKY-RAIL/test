@@ -1,23 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>관리자 로그인</title>
+    <title>관리자 모드</title>
 </head>
 <body>
-    <h1>관리자 로그인</h1>
-    <form method="POST">
-        <label for="password">관리자 비밀번호:</label>
-        <input type="password" id="password" name="password" required>
-        <button type="submit">로그인</button>
+    <h1>관리자 모드</h1>
+    <form method="GET" action="{{ url_for('view_orders') }}">
+        <button type="submit">직접수령주문내역보기</button>
     </form>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul>
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
+    <form method="GET" action="{{ url_for('co') }}">
+        <button type="submit">배달수령주문내역보기</button>
+    </form>
 </body>
 </html>
